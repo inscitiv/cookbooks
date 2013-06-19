@@ -30,7 +30,9 @@ echo '
 
 site "http://community.opscode.com/api/v1"
 
-cookbook "conjur-pam-ldap", git: "git://github.com/inscitiv/cookbooks.git", path: "conjur-pam-ldap"
+cookbook 'conjur', git: 'git://github.com/inscitiv/cookbooks.git', path: 'conjur'
+cookbook 'notifying-action', git: 'git://github.com/inscitiv/cookbooks.git', path: 'notifying-action'
+cookbook 'conjur-pam-ldap', git: 'git://github.com/inscitiv/cookbooks.git', path: 'conjur-pam-ldap'
 ' > Cheffile
 echo '
 stack: ci

@@ -1,5 +1,6 @@
 notifying_action :create do
   src = begin
+    require 'etc'
     Etc.getgrnam(new_resource.name).gid
   rescue ArgumentError
     nil
@@ -12,9 +13,7 @@ notifying_action :create do
       gid new_resource.gid
       action :modify
     end
-    execute "change gid of #{src} to #{new_resource.gid}" do
-      command "find / -gid #{src} -exec chgrp #{new_resource.gid} {} +"
-    end
+    execute "find / -gid #{src} -exec chgrp #{new_resource.gid} {} +"
   else
     group new_resource.name do
       gid new_resource.gid

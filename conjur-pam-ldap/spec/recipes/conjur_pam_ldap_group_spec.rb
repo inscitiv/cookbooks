@@ -21,8 +21,6 @@ describe 'test-conjur-pam-ldap-group::default' do
       Etc.should_receive(:getgrnam).with('admin').and_raise ArgumentError
     }
     it 'creates the group' do
-      converge
-      
       expect(converge).to create_group('admin')
       expect(converge).to_not modify_group('admin')
     end
@@ -30,14 +28,24 @@ describe 'test-conjur-pam-ldap-group::default' do
   context "when a group exists" do
     before {
       require 'etc'
-      Etc.should_receive(:getgrnam).with('admin').and_return double(:group, gid: 101)
+      Etc.should_receive(:getgrnam).with('admin').and_return double(:group, gid: gid)
     }
-    it 'updates the group' do
-      converge
-      
-      expect(converge).to_not create_group('admin')
-      expect(converge).to modify_group('admin')
-      expect(converge).to execute_command("find / -gid 101 -exec chgrp 50000 {} +")
+    context "with the same gid" do
+      let(:gid) { 50000 }
+      it 'does nothing' do
+        converge
+        
+        # The LWRP resource should be the only one
+        chef_run.resources.map{|c| [ c.resource_name, c.name ]}.should == [ [:"conjur-pam-ldap_group", "admin"] ]
+      end
+    end
+    context "with a different gid" do
+      let(:gid) { 101 }
+      it 'updates the group' do
+        expect(converge).to_not create_group('admin')
+        expect(converge).to modify_group('admin')
+        expect(converge).to execute_command("find / -gid 101 -exec chgrp 50000 {} + | true")
+      end
     end
   end
 end

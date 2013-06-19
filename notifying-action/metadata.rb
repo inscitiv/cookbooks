@@ -1,0 +1,6 @@
+maintainer       "Conjur Inc"
+maintainer_email "ops@conjur.net"
+name             "notifying-action"
+license          "All rights reserved"
+description      "Utility functions"
+version          "0.1.0"

@@ -1,0 +1,41 @@
+#!/bin/sh
+set -e
+
+apt-get update
+apt-get install -y git
+
+curl -L http://www.opscode.com/chef/install.sh | bash -s
+/opt/chef/embedded/bin/gem install librarian-chef conjur-cli --no-rdoc --no-ri
+cd /var
+mkdir /etc/chef
+echo '
+log_level       :info
+log_location    STDOUT
+file_cache_path "/var/chef-solo"
+cookbook_path   ["/var/chef-repo/site-cookbooks", "/var/chef-repo/cookbooks"]
+role_path       "/var/chef-repo/roles"
+json_attribs    "/etc/chef/node.json"
+' > /etc/chef/solo.rb
+echo '
+{
+  "run_list": [ "conjur-pam-ldap" ]
+}
+' > /etc/chef/node.json
+cd /var
+mkdir chef-repo
+cd chef-repo
+echo '
+#!/usr/bin/env ruby
+#^syntax detection
+
+site "http://community.opscode.com/api/v1"
+
+cookbook "conjur-pam-ldap", git: "git://github.com/inscitiv/cookbooks.git", path: "conjur-pam-ldap"
+' > Cheffile
+echo '
+stack: ci
+account: ci
+' > /root/.conjurrc
+/opt/chef/embedded/bin/librarian-chef install
+# Enroll the host
+# chef-solo

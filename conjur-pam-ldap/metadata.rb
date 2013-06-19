@@ -3,7 +3,7 @@ maintainer_email "ops@conjur.net"
 name             "conjur-pam-ldap"
 license          "All rights reserved"
 description      "Installs/Configures Conjur PAM+LDAP"
-version          "0.1.2"
+version          "0.1.3"
 
 depends   "conjur"
 depends   "notifying-action"
